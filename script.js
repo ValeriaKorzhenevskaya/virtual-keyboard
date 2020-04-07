@@ -1,19 +1,19 @@
 function createKeyboardElements() {
-  let body = document.querySelector("body");
+  const body = document.querySelector("body");
 
-  let wrapper = document.createElement("div");
+  const wrapper = document.createElement("div");
   wrapper.classList.add("wrapper");
   body.append(wrapper);
 
-  let textarea = document.createElement("textarea");
+  const textarea = document.createElement("textarea");
   textarea.classList.add("textarea");
   wrapper.append(textarea);
 
-  let keyboard = document.createElement("div");
+  const keyboard = document.createElement("div");
   keyboard.classList.add("keyboard");
   wrapper.append(keyboard);
 
-  let clear = document.createElement("div");
+  const clear = document.createElement("div");
   clear.classList.add("clearfix");
   keyboard.append(clear);
 
@@ -102,7 +102,7 @@ let isCapsLock = false;
 const textarea = document.querySelector(".textarea");
 const keyboard = document.querySelector(".keyboard");
 const clear = document.querySelector(".clearfix");
-let LastPress = "";
+let lastPress = "";
 
 class Button {
   constructor({ code, key, style, ...arg }) {
@@ -116,6 +116,7 @@ class Button {
     div.className = this.className;
     div.dataset.key = this.key;
     div.dataset.code = this.code;
+    div.innerHTML = this.code;
     return div;
   }
 }
@@ -145,31 +146,27 @@ addListenersOnKeys();
 function addKeysOnKeyboard() {
   let arrayValues = Object.values(KEY_CODE);
 
+  arrayValues.forEach((el) => {
+    if (el[0] === "rShift") {
+      document.querySelector(".rShift").after(clear);
+    }
+  });
+
   if (isShift === false && localStorage.lang === "ENG") {
     arrayValues.forEach((el) => {
-      let x = document.querySelector(`.${el[0]}`);
+      const x = document.querySelector(`.${el[0]}`);
       if (el.length < 2) {
         x.innerText = el[0];
       } else if (el[0] === "enter") {
       } else if (el[1] !== undefined) {
         x.innerText = el[1];
       }
-
-      if (
-        el[0] === "Backspace" ||
-        el[0] === "del" ||
-        el[0] === "enter" ||
-        el[0] === "rShift"
-      ) {
-        document.querySelector(".Backspace").after(clear);
-        document.querySelector(".rShift").after(clear);
-      }
     });
   }
 
   if (isShift === true && localStorage.lang === "ENG") {
     arrayValues.forEach((el) => {
-      let x = document.querySelector(`.${el[0]}`);
+      const x = document.querySelector(`.${el[0]}`);
       if (el.length < 2) {
         x.innerText = el[0];
       } else if (el[0] === "enter") {
@@ -181,7 +178,7 @@ function addKeysOnKeyboard() {
 
   if (isShift === false && localStorage.lang === "RUS") {
     arrayValues.forEach((el) => {
-      let x = document.querySelector(`.${el[0]}`);
+      const x = document.querySelector(`.${el[0]}`);
       if (el.length < 2) {
         x.innerText = el[0];
       } else if (el[0] === "enter") {
@@ -193,7 +190,7 @@ function addKeysOnKeyboard() {
 
   if (isShift === true && localStorage.lang === "RUS") {
     arrayValues.forEach((el) => {
-      let x = document.querySelector(`.${el[0]}`);
+      const x = document.querySelector(`.${el[0]}`);
       if (el.length < 2) {
         x.innerText = el[0];
       } else if (el[0] === "enter") {
@@ -208,7 +205,7 @@ function addListenersOnKeys() {
   keyboard.addEventListener("mousedown", function (event) {
     textarea.focus();
     if (event.target.classList[0] === "keyboard") return;
-    LastPress = event.target;
+    lastPress = event.target;
     setStyle(event.target, true);
     identifyKey(event.target.dataset, "down");
     addKeysOnKeyboard();
@@ -247,12 +244,12 @@ function setStyle(code, bool) {
 }
 
 function removeStyle() {
-  LastPress.classList.remove("active");
+  lastPress.classList.remove("active");
 }
 
 function identifyKey(event, updown) {
   if (event.code === "ShiftLeft") {
-    if (shiftCaseLeft) shiftCaseLeft = false;
+    if (shiftCaseLeft && shiftCaseLeft) shiftCaseLeft = false;
     else shiftCaseLeft = true;
   }
 
@@ -326,37 +323,22 @@ function printKeyCode(key) {
 }
 
 function checkLang() {
-  if (changeLangUpKeyFlag) {
-    if (altCaseLeft === false && shiftCaseLeft === false) {
+  if (changeLangUpKeyFlag && altCaseLeft === false && shiftCaseLeft === false) {
       changeLangUpKeyFlag = false;
       changeLang();
       addKeysOnKeyboard();
-    }
   } else if (altCaseLeft === true && shiftCaseLeft === true) {
     changeLangUpKeyFlag = true;
   } else return;
 }
 
 function changeLang() {
-  if (localStorage.lang === "ENG") {
-    localStorage.lang = "RUS";
-  } else {
-    localStorage.lang = "ENG";
-  }
+  localStorage.lang = localStorage.lang === "ENG" ? "RUS" : "ENG";
 }
 
 function capsButtonIsPress() {
-  if (isCapsLock === true) {
-    isCapsLock = false;
-  } else {
-    isCapsLock = true;
-  }
-
-  if (isShift === true) {
-    isShift = false;
-  } else {
-    isShift = true;
-  }
+ isCapsLock = isCapsLock === true ? false :  true;
+ isShift = isShift === true ? false : true;    
 }
 
 function tabCase() {
